@@ -687,14 +687,20 @@ body.cursor-active [role="button"] {
     letter-spacing: 0.28em;
   }
 
-  /* ── Ambulance zoom: windscreen focus, sharper rendering ── */
+  /* Push text layer lower so it sits over the ambulance area rather than
+     crowding the very top of the screen. Desktop value is ~18vh; 38vh
+     shifts it toward the vertical centre, above where the ambulance body sits. */
+  .text-layer {
+    padding-top: clamp(80px, 38vh, 220px);
+    justify-content: flex-start;
+  }
 
-  /* Desktop origin 72% targets the lower body. Shift up to ~42% to land
-     nearer the windscreen on a typical ambulance side-view silhouette. */
+  /* ── Ambulance zoom: restore desktop behaviour on mobile ── */
+
+  /* The mobile transform-origin override (center 42%) broke the zoom targeting.
+     Remove it — mobile inherits the desktop value (center 72%) which is correct. */
   .ambulance {
-    transform-origin: center 42%;
-    /* Promote to GPU layer with explicit 3D context; reduces subpixel blur
-       during the scale animation on iOS/Safari. */
+    transform-origin: center 72%;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
   }
