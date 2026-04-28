@@ -127,17 +127,15 @@
     var group   = stage.querySelector('.text-zoom-group');
     var overlay = stage.querySelector('.text-zoom-overlay');
 
-    var MAX_TEXT_SCALE = 130;
+    var MAX_TEXT_SCALE = 200;
     var EMERGE_END     = 0.05;
-    var FINAL_P        = 0.88;
+    var FINAL_P        = 1.00;   // overlay reaches full yellow only at the very end of the zoom
+    var OVERLAY_START  = 0.97;   // yellow starts only when text has nearly filled the screen
     var tzTicking      = false;
 
-    // Hard-end yellow layer — body child, z-index 20, immune to stage fade-out.
-    var finalWhite = document.createElement('div');
-    finalWhite.style.cssText = 'position:fixed;inset:0;background:#E0A020;opacity:0;pointer-events:none;z-index:20;';
-    document.body.appendChild(finalWhite);
-
     function easeInCubic(t) { return t * t * t; }
+
+    function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
 
     function updateTextZoom() {
       var sy      = window.scrollY;
@@ -148,41 +146,38 @@
       var zEnd   = spacerH + driver.offsetHeight - vh;
       var zRange = zEnd - zStart;
 
-      // Stage opacity: visible during zoom window, fades out after zEnd
+      // Stage: fully on during zoom window, fades quickly after zEnd.
+      // Before zStart the hero is still visible so stage stays at 0.
       var stageOp;
       if (sy < zStart) {
         stageOp = 0;
       } else if (sy <= zEnd) {
         stageOp = 1;
       } else {
-        stageOp = Math.max(1 - (sy - zEnd) / (vh * 0.5), 0);
+        stageOp = clamp01(1 - (sy - zEnd) / (vh * 0.25));
       }
       stage.style.opacity = stageOp.toFixed(3);
 
-      var p = Math.min(Math.max((sy - zStart) / zRange, 0), 1);
+      // Progress through the zoom window — clamped, no history, no lerp.
+      var p = clamp01((sy - zStart) / zRange);
 
-      var textOp = Math.min(p / EMERGE_END, 1);
-      var scale  = 1 + easeInCubic(p) * (MAX_TEXT_SCALE - 1);
+      // All output values are pure functions of p — no branching, no state.
+      // Scrolling to any position always produces the exact same result.
 
-      if (p >= FINAL_P) {
-        stage.style.background         = '#E0A020';
-        document.body.style.background = '#E0A020';
-        finalWhite.style.opacity       = sy >= zEnd ? '0' : '1';
-        group.style.transform          = 'scale(1)';
-        group.style.display            = 'none';
-        overlay.style.opacity          = '0';
-        tzTicking = false;
-        return;
-      }
+      // Text: emerges quickly at the start, stays fully opaque through the zoom.
+      var textOp = clamp01(p / EMERGE_END);
 
-      // Below threshold — reset lock styles (handles back-scroll)
-      stage.style.background         = '';
-      document.body.style.background = '';
-      finalWhite.style.opacity       = '0';
-      group.style.display            = '';
-      group.style.opacity            = textOp.toFixed(3);
-      group.style.transform          = 'scale(' + scale.toFixed(4) + ')';
-      overlay.style.opacity          = '0';
+      // Scale: eased growth from 1 → MAX_TEXT_SCALE.
+      var scale = 1 + easeInCubic(p) * (MAX_TEXT_SCALE - 1);
+
+      // Yellow overlay: zero until OVERLAY_START, then linear to 1 at FINAL_P, clamps at 1.
+      // At p = 1 (= zEnd), overlayOp is already 1, so the stage fade-out reveals the
+      // yellow .text-zoom-driver background underneath — seamless, no flash.
+      var overlayOp = clamp01((p - OVERLAY_START) / (FINAL_P - OVERLAY_START));
+
+      group.style.opacity   = textOp.toFixed(3);
+      group.style.transform = 'translate(-50%, -50%) scale(' + scale.toFixed(4) + ')';
+      overlay.style.opacity = overlayOp.toFixed(3);
 
       tzTicking = false;
     }
@@ -352,6 +347,100 @@
         img.src = './assets/parliament/frame_' + idx + '.webp';
       }(i));
     }
+  }());
+
+  // ── Site navigation ──────────────────────────────────────────────────────
+  // Fades in after the typography zoom resolves.
+  // Switches between white text (dark sections) and black text (yellow sections).
+  (function initNav() {
+    var nav      = document.querySelector('.site-nav');
+    if (!nav) return;
+
+    var driver   = document.querySelector('.text-zoom-driver');
+    var colorDiv = document.querySelector('.color-transition');
+
+    var navShown = false;
+    var colorMid = Infinity;   // document-y where nav flips to white text
+
+    function measure() {
+      var sy = window.scrollY;
+      if (colorDiv) {
+        colorMid = colorDiv.getBoundingClientRect().top + sy
+                   + colorDiv.offsetHeight * 0.40;
+      }
+    }
+
+    function updateNav() {
+      var sy   = window.scrollY;
+      var vh   = window.innerHeight;
+      var zEnd = scrollSpacer.offsetHeight + driver.offsetHeight - vh;
+
+      if (!navShown && sy > zEnd) {
+        navShown = true;
+        nav.classList.add('site-nav--visible');
+        document.body.classList.add('cursor-active');
+      }
+
+      if (!navShown) return;
+
+      // Yellow zone → dark text; parliament/credit → white text
+      nav.classList.toggle('site-nav--light', sy < colorMid);
+    }
+
+    window.addEventListener('scroll', updateNav, { passive: true });
+    window.addEventListener('resize', function () { measure(); updateNav(); });
+
+    measure();
+    updateNav();
+  }());
+
+  // ── Runner cursor ─────────────────────────────────────────────────────────
+  // Single <img id="runner-cursor"> fixed at z:0 (root stacking context).
+  // clientX/clientY map directly — no coord conversion needed for fixed elements.
+  // Opacity is scroll-gated: 0 until parliament scrolls away, then fades in;
+  // fades back to 0 as s-credit's bottom approaches the viewport.
+  (function initRunCursor() {
+    var runner     = document.getElementById('runner-cursor');
+    if (!runner) return;
+    var parliament = document.querySelector('.s-parliament');
+    var credit     = document.querySelector('.s-credit');
+
+    var hasMoved = false;
+
+    function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
+
+    function getScrollMult() {
+      var vh = window.innerHeight;
+
+      // 0 while parliament is visible; ramps 0→1 as it scrolls away
+      var parlFade = 1;
+      if (parliament) {
+        var pb = parliament.getBoundingClientRect().bottom;
+        parlFade = clamp01((vh * 0.50 - pb) / (vh * 0.65));
+      }
+
+      // 1 while credit is in view; fades as credit bottom nears viewport top
+      var creditFade = 1;
+      if (credit) {
+        var cb = credit.getBoundingClientRect().bottom;
+        creditFade = clamp01((cb - vh * 0.10) / (vh * 0.50));
+      }
+
+      return parlFade * creditFade;
+    }
+
+    function updateOpacity() {
+      runner.style.opacity = (hasMoved ? getScrollMult() : 0).toFixed(3);
+    }
+
+    window.addEventListener('pointermove', function (e) {
+      hasMoved = true;
+      runner.style.transform =
+        'translate(' + e.clientX + 'px, ' + e.clientY + 'px) translate(-50%, -50%)';
+      updateOpacity();
+    });
+
+    window.addEventListener('scroll', updateOpacity, { passive: true });
   }());
 
 }());

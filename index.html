@@ -8,83 +8,117 @@
 </head>
 <body>
 
-  <div class="scroll-spacer"></div>
+  <!-- ── Navigation ──────────────────────────────────────────────────────────── -->
+  <nav class="site-nav" aria-label="Site navigation">
+    <a class="site-nav__logo" href="https://www.therunathon.com" target="_blank" rel="noopener" aria-label="Runathon home">
+      <img src="./assets/Runathon-Icon-Logo.png" alt="Runathon" />
+    </a>
+    <ul class="site-nav__links" role="list">
+      <li><a href="https://www.therunathon.com/info" target="_blank" rel="noopener">Info</a></li>
+      <li><a href="https://app.therunathon.com/" target="_blank" rel="noopener">App</a></li>
+      <li><a href="https://www.therunathon.com/about" target="_blank" rel="noopener">About</a></li>
+      <li><a href="https://www.therunathon.com/category/runathon-merchandise" target="_blank" rel="noopener">Merch</a></li>
+      <li><a href="https://www.therunathon.com/donate" target="_blank" rel="noopener">Donate</a></li>
+    </ul>
+  </nav>
 
-  <!-- Text zoom driver — creates scroll distance for the typography zoom. -->
-  <div class="text-zoom-driver"></div>
+  <!--
+    Runner cursor — position:fixed, z-index:0 (root stacking context).
+    Sits below .site-content (z:10) so all section text is above it.
+    Transparent sections in .glow-zone reveal the runner through them.
+    Opacity is scroll-gated via JS: hidden during parliament, shown after.
+  -->
+  <img id="runner-cursor" class="runner" src="./assets/runner.png" alt="" draggable="false">
 
-  <!-- ── Section 1: What is the Runathon ──────────────────────────────────── -->
-  <section class="s-what">
-    <div class="s-what__inner">
-      <h2 class="s-what__headline fade-up">WHAT IS THE RUNATHON?</h2>
-      <p class="s-what__body fade-up">The Wellington College Runathon is a 24-hour student-led fundraising event where students run through the day and night to raise money for life-saving causes.</p>
+  <!-- .site-content z:10 stacking context — all page sections sit above the runner -->
+  <div class="site-content">
+
+    <div class="scroll-spacer"></div>
+
+    <!-- Text zoom driver — creates scroll distance for the typography zoom. -->
+    <div class="text-zoom-driver"></div>
+
+    <!-- ── Section 1: What is the Runathon ──────────────────────────────────── -->
+    <section class="s-what">
+      <div class="s-what__inner">
+        <h2 class="s-what__headline fade-up">WHAT IS THE RUNATHON?</h2>
+        <p class="s-what__body fade-up">The Wellington College Runathon is a 24-hour student-led fundraising event where students run through the day and night to raise money for life-saving causes.</p>
+      </div>
+    </section>
+
+    <!-- ── Section 2: Goal + Impact ─────────────────────────────────────────── -->
+    <section class="s-goal">
+      <div class="s-goal__inner">
+        <p class="s-goal__eyebrow fade-up">IN 2026, SUPPORTING</p>
+        <h2 class="s-goal__org fade-up">Wellington Free Ambulance</h2>
+        <div class="s-goal__stats">
+          <div class="stat fade-up">
+            <span class="stat__val">$175,246</span>
+            <span class="stat__lbl">raised so far</span>
+          </div>
+          <div class="stat fade-up" style="transition-delay:0.10s">
+            <span class="stat__val">$300,000</span>
+            <span class="stat__lbl">goal</span>
+          </div>
+          <div class="stat fade-up" style="transition-delay:0.20s">
+            <span class="stat__val">12,411</span>
+            <span class="stat__lbl">laps</span>
+          </div>
+          <div class="stat fade-up" style="transition-delay:0.30s">
+            <span class="stat__val">$1,750,000+</span>
+            <span class="stat__lbl">total raised historically</span>
+          </div>
+        </div>
+        <div class="s-goal__progress fade-up">
+          <div class="progress-labels">
+            <span>$175,246</span>
+            <span>$300,000</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- White → black cinematic transition -->
+    <div class="color-transition"></div>
+
+    <!-- ── Section 3: Parliament ────────────────────────────────────────────── -->
+    <section class="s-parliament">
+      <div class="s-parliament__bg" aria-hidden="true">BE THERE OR<br>BE SQUARE</div>
+      <div class="s-parliament__edge s-parliament__edge--left"></div>
+      <div class="s-parliament__edge s-parliament__edge--right"></div>
+      <div class="s-parliament__grid">
+        <div class="parl-col parl-col--left fade-in">
+          <span class="parl-eyebrow">NEXT STOP</span>
+          <h2 class="parl-heading">PARLIAMENT</h2>
+        </div>
+        <div class="parl-col parl-col--center">
+          <canvas id="parliament-canvas"></canvas>
+        </div>
+        <div class="parl-col parl-col--right fade-in">
+          <p class="parl-event-title">Meeting the Prime Minister</p>
+          <p class="parl-event-date">May 12</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Shared zone: Run + Credit (transparent bg — runner shows through) ── -->
+    <div class="glow-zone">
+      <section class="run-bigger-section">
+        <h2 class="run-text">RUN FOR SOMETHING BIGGER</h2>
+      </section>
+
+      <section class="s-credit">
+        <div class="s-credit__inner">
+          <p class="s-credit__by fade-up">MADE BY</p>
+          <h2 class="s-credit__name fade-up">MAX DELAHUNTY</h2>
+        </div>
+      </section>
     </div>
-  </section>
 
-  <!-- ── Section 2: Goal + Impact ─────────────────────────────────────────── -->
-  <section class="s-goal">
-    <div class="s-goal__inner">
-      <p class="s-goal__eyebrow fade-up">IN 2026, SUPPORTING</p>
-      <h2 class="s-goal__org fade-up">Wellington Free Ambulance</h2>
-      <div class="s-goal__stats">
-        <div class="stat fade-up">
-          <span class="stat__val">$175,246</span>
-          <span class="stat__lbl">raised so far</span>
-        </div>
-        <div class="stat fade-up" style="transition-delay:0.10s">
-          <span class="stat__val">$300,000</span>
-          <span class="stat__lbl">goal</span>
-        </div>
-        <div class="stat fade-up" style="transition-delay:0.20s">
-          <span class="stat__val">12,411</span>
-          <span class="stat__lbl">laps</span>
-        </div>
-        <div class="stat fade-up" style="transition-delay:0.30s">
-          <span class="stat__val">$1,750,000+</span>
-          <span class="stat__lbl">total raised historically</span>
-        </div>
-      </div>
-      <div class="s-goal__progress fade-up">
-        <div class="progress-labels">
-          <span>$175,246</span>
-          <span>$300,000</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- White → black cinematic transition -->
-  <div class="color-transition"></div>
-
-  <!-- ── Section 3: Parliament ────────────────────────────────────────────── -->
-  <section class="s-parliament">
-    <div class="s-parliament__edge s-parliament__edge--left"></div>
-    <div class="s-parliament__edge s-parliament__edge--right"></div>
-    <div class="s-parliament__grid">
-      <div class="parl-col parl-col--left fade-in">
-        <span class="parl-eyebrow">NEXT STOP</span>
-        <h2 class="parl-heading">PARLIAMENT</h2>
-      </div>
-      <div class="parl-col parl-col--center">
-        <canvas id="parliament-canvas"></canvas>
-      </div>
-      <div class="parl-col parl-col--right fade-in">
-        <p class="parl-event-title">Meeting the Prime Minister</p>
-        <p class="parl-event-date">May 12</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Section 4: Credit ────────────────────────────────────────────────── -->
-  <section class="s-credit">
-    <div class="s-credit__inner">
-      <p class="s-credit__by fade-up">MADE BY</p>
-      <h2 class="s-credit__name fade-up">MAX DALAHUNTY</h2>
-    </div>
-  </section>
+  </div><!-- /.site-content -->
 
   <!-- Fixed hero stage — z-index 10, never scrolls -->
   <div class="hero">
