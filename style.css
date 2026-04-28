@@ -1,0 +1,508 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  cursor: none !important;
+}
+
+html, body {
+  width: 100%;
+  background: #000;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ── Scroll driver ───────────────────────────────────────────────────────────
+   300vh height = 200vh of actual scroll range (300vh − 100vh viewport).
+   maxScroll in JS is computed from THIS element's offsetHeight so that
+   content below never changes the hero animation timing.
+────────────────────────────────────────────────────────────────────────── */
+.scroll-spacer {
+  height: 300vh;
+}
+
+/* ── Hero: fixed fullscreen camera stage ─────────────────────────────────────
+   Never moves. Scroll only drives animation progress via window.scrollY.
+   overflow:hidden clips the zooming ambulance at the screen edges.
+────────────────────────────────────────────────────────────────────────── */
+.hero {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* ── Layer 1: spotlight canvas ── */
+#spotlight {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ── Layer 2: black text ── */
+.text-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: clamp(80px, 18vh, 210px);
+  gap: 22px;
+  z-index: 2;
+  user-select: none;
+  pointer-events: none;
+}
+
+.heading {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(76px, 11vw, 162px);
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  color: #000;
+  line-height: 1;
+  text-align: center;
+}
+
+.subheading {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(10px, 1.25vw, 17px);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  color: #000;
+  text-align: center;
+}
+
+/* ── Layer 3: ambulance ── */
+.ambulance-wrap {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.ambulance {
+  width: clamp(640px, 82vw, 1200px);
+  height: auto;
+  display: block;
+  transform-origin: center 72%;
+  will-change: transform;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TEXT ZOOM SECTION
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* 220vh — brings content into view sooner after the yellow takeover */
+.text-zoom-driver {
+  height: 220vh;
+}
+
+/* Fixed fullscreen stage — JS owns opacity */
+.text-zoom-stage {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  overflow: hidden;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.text-zoom-group {
+  text-align: center;
+  opacity: 0;
+  transform-origin: 48% 38%;
+  will-change: transform, opacity;
+}
+
+.zoom-svg {
+  display: block;
+  width: clamp(300px, 70vw, 1100px);
+  height: auto;
+  overflow: visible;
+}
+
+/* Override SVG presentation attributes — CSS wins over inline fill */
+.zoom-svg text:first-of-type {
+  fill: #E0A020;
+}
+
+.zoom-svg text:last-of-type {
+  fill: #E0A020;
+  fill-opacity: 0.55;
+}
+
+.text-zoom-overlay {
+  position: absolute;
+  inset: 0;
+  background: #E0A020;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  will-change: opacity;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CONTENT SECTIONS
+═══════════════════════════════════════════════════════════════════════════ */
+
+/* Fade-up — opacity + subtle lift */
+.fade-up {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.75s ease, transform 0.75s ease;
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Fade-in — opacity only (dark sections) */
+.fade-in {
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+}
+
+/* Stagger within sections */
+.s-what__body.fade-up     { transition-delay: 0.15s; }
+.s-goal__org.fade-up      { transition-delay: 0.10s; }
+.s-goal__progress.fade-up { transition-delay: 0.10s; }
+.s-credit__name.fade-up   { transition-delay: 0.12s; }
+
+
+/* ── Section 1: What is the Runathon ── */
+
+.s-what {
+  background: #E0A020;
+  padding: clamp(60px, 10vh, 120px) clamp(24px, 6vw, 80px);
+  text-align: center;
+}
+
+.s-what__inner {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.s-what__headline {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(28px, 4vw, 56px);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #111;
+  line-height: 1.1;
+  text-transform: uppercase;
+  margin-bottom: clamp(28px, 4.5vh, 52px);
+}
+
+.s-what__body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(15px, 1.35vw, 19px);
+  font-weight: 400;
+  line-height: 1.85;
+  color: #1a1a1a;
+}
+
+
+/* ── Section 2: Goal + Impact ── */
+
+.s-goal {
+  background: #E0A020;
+  padding: clamp(80px, 12vh, 140px) clamp(24px, 6vw, 80px);
+  text-align: center;
+}
+
+/* Cinematic fade — structural only, no content */
+.color-transition {
+  height: 70vh;
+  background: linear-gradient(
+    to bottom,
+    #E0A020  0%,
+    #E0A020  8%,
+    #C48818 22%,
+    #9A6410 34%,
+    #6E4208 46%,
+    #462A04 58%,
+    #281602 70%,
+    #140A01 82%,
+    #0a0a0a 92%,
+    #0a0a0a 100%
+  );
+}
+
+.s-goal__inner {
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.s-goal__eyebrow {
+  display: block;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(9px, 0.85vw, 12px);
+  font-weight: 700;
+  letter-spacing: 0.38em;
+  color: rgba(0, 0, 0, 0.65);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.s-goal__org {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(22px, 2.8vw, 40px);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #111;
+  margin-bottom: clamp(48px, 8vh, 88px);
+}
+
+.s-goal__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(16px, 3vw, 40px);
+  margin-bottom: clamp(48px, 8vh, 80px);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.stat__val {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(18px, 2.2vw, 34px);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: #111;
+}
+
+.stat__lbl {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(9px, 0.8vw, 11px);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: rgba(0, 0, 0, 0.65);
+  text-transform: uppercase;
+}
+
+.s-goal__progress {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.progress-track {
+  height: 7px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: rgba(0, 0, 0, 0.52);
+  width: 0;
+  border-radius: 4px;
+  transition: width 2.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+
+/* ── Section 3: Parliament ── */
+
+.s-parliament {
+  position: relative;
+  background: #0a0a0a;
+  overflow: hidden;
+  padding: clamp(100px, 16vh, 220px) 0;
+}
+
+.s-parliament__edge {
+  position: absolute;
+  top: 0;
+  width: 32%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.s-parliament__edge--left {
+  left: 0;
+  background: none;
+}
+
+.s-parliament__edge--right {
+  right: 0;
+  background: none;
+}
+
+.s-parliament__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 clamp(40px, 6vw, 100px);
+}
+
+.parl-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.parl-col--left {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.parl-col--right {
+  align-items: flex-start;
+  text-align: left;
+}
+
+.parl-col--center {
+  align-items: center;
+}
+
+.parl-eyebrow {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(8px, 0.75vw, 11px);
+  font-weight: 700;
+  letter-spacing: 0.38em;
+  color: #E0A020;
+  text-transform: uppercase;
+  margin-bottom: 0.7rem;
+}
+
+.parl-heading {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(22px, 2.8vw, 44px);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  color: #f2f2f2;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.parl-event-title {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(13px, 1.2vw, 18px);
+  font-weight: 700;
+  color: #f2f2f2;
+  line-height: 1.4;
+  margin-bottom: 0.6rem;
+}
+
+.parl-event-date {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  color: rgba(242, 242, 242, 0.45);
+  text-transform: uppercase;
+}
+
+#parliament-canvas {
+  display: block;
+  width: clamp(180px, 26vw, 360px);
+  height: auto;
+}
+
+
+/* ── Section 4: Credit ── */
+
+.s-credit {
+  min-height: 100vh;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(60px, 10vh, 120px) clamp(24px, 5vw, 80px);
+}
+
+.s-credit__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(12px, 2vh, 28px);
+}
+
+.s-credit__by {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(14px, 2vw, 34px);
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  color: rgba(242, 242, 242, 0.4);
+  text-transform: uppercase;
+}
+
+.s-credit__name {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: clamp(52px, 10.5vw, 192px);
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: #f2f2f2;
+  text-transform: uppercase;
+  line-height: 0.88;
+}
+
+
+/* ── Responsive ── */
+
+@media (max-width: 680px) {
+  .s-goal__stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .s-parliament__grid {
+    grid-template-columns: 1fr;
+    gap: clamp(40px, 8vw, 60px);
+    text-align: center;
+  }
+
+  .parl-col--left,
+  .parl-col--right {
+    align-items: center;
+    text-align: center;
+  }
+
+  .parl-col--center {
+    order: -1;
+  }
+}

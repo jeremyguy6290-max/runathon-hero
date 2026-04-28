@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Runathon</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="scroll-spacer"></div>
+
+  <!-- Text zoom driver — creates scroll distance for the typography zoom. -->
+  <div class="text-zoom-driver"></div>
+
+  <!-- ── Section 1: What is the Runathon ──────────────────────────────────── -->
+  <section class="s-what">
+    <div class="s-what__inner">
+      <h2 class="s-what__headline fade-up">WHAT IS THE RUNATHON?</h2>
+      <p class="s-what__body fade-up">The Wellington College Runathon is a 24-hour student-led fundraising event where students run through the day and night to raise money for life-saving causes.</p>
+    </div>
+  </section>
+
+  <!-- ── Section 2: Goal + Impact ─────────────────────────────────────────── -->
+  <section class="s-goal">
+    <div class="s-goal__inner">
+      <p class="s-goal__eyebrow fade-up">IN 2026, SUPPORTING</p>
+      <h2 class="s-goal__org fade-up">Wellington Free Ambulance</h2>
+      <div class="s-goal__stats">
+        <div class="stat fade-up">
+          <span class="stat__val">$175,246</span>
+          <span class="stat__lbl">raised so far</span>
+        </div>
+        <div class="stat fade-up" style="transition-delay:0.10s">
+          <span class="stat__val">$300,000</span>
+          <span class="stat__lbl">goal</span>
+        </div>
+        <div class="stat fade-up" style="transition-delay:0.20s">
+          <span class="stat__val">12,411</span>
+          <span class="stat__lbl">laps</span>
+        </div>
+        <div class="stat fade-up" style="transition-delay:0.30s">
+          <span class="stat__val">$1,750,000+</span>
+          <span class="stat__lbl">total raised historically</span>
+        </div>
+      </div>
+      <div class="s-goal__progress fade-up">
+        <div class="progress-labels">
+          <span>$175,246</span>
+          <span>$300,000</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- White → black cinematic transition -->
+  <div class="color-transition"></div>
+
+  <!-- ── Section 3: Parliament ────────────────────────────────────────────── -->
+  <section class="s-parliament">
+    <div class="s-parliament__edge s-parliament__edge--left"></div>
+    <div class="s-parliament__edge s-parliament__edge--right"></div>
+    <div class="s-parliament__grid">
+      <div class="parl-col parl-col--left fade-in">
+        <span class="parl-eyebrow">NEXT STOP</span>
+        <h2 class="parl-heading">PARLIAMENT</h2>
+      </div>
+      <div class="parl-col parl-col--center">
+        <canvas id="parliament-canvas"></canvas>
+      </div>
+      <div class="parl-col parl-col--right fade-in">
+        <p class="parl-event-title">Meeting the Prime Minister</p>
+        <p class="parl-event-date">May 12</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Section 4: Credit ────────────────────────────────────────────────── -->
+  <section class="s-credit">
+    <div class="s-credit__inner">
+      <p class="s-credit__by fade-up">MADE BY</p>
+      <h2 class="s-credit__name fade-up">MAX DALAHUNTY</h2>
+    </div>
+  </section>
+
+  <!-- Fixed hero stage — z-index 10, never scrolls -->
+  <div class="hero">
+    <canvas id="spotlight"></canvas>
+    <div class="text-layer">
+      <h1 class="heading">RUNATHON</h1>
+      <p class="subheading">SUPPORTING WELLINGTON FREE AMBULANCE</p>
+    </div>
+    <div class="ambulance-wrap">
+      <img class="ambulance" src="./assets/ambulance.png" alt="Wellington Free Ambulance" />
+    </div>
+  </div>
+
+  <div class="text-zoom-stage">
+    <div class="text-zoom-group">
+      <svg class="zoom-svg" viewBox="0 0 1400 200" xmlns="http://www.w3.org/2000/svg"
+           role="img" aria-label="This is the Runathon. 24 hours. One school. One goal.">
+        <text x="700" y="110"
+          font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+          font-size="90" font-weight="900" letter-spacing="7"
+          fill="#f2f2f2" text-anchor="middle">THIS IS THE RUNATHON</text>
+        <text x="700" y="162"
+          font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+          font-size="18" font-weight="900" letter-spacing="6"
+          fill="#f2f2f2" fill-opacity="0.48"
+          text-anchor="middle">24 HOURS. ONE SCHOOL. ONE GOAL.</text>
+      </svg>
+    </div>
+    <div class="text-zoom-overlay"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
