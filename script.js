@@ -58,14 +58,21 @@
     requestAnimationFrame(drawSpotlight);
   }
 
-  window.addEventListener('mousemove', function (e) {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
   window.addEventListener('resize', resize);
   resize();
-  drawSpotlight();
+
+  // Skip spotlight on touch/mobile — canvas is hidden via CSS and there is no
+  // cursor to follow, so avoid running a 60fps RAF loop for no visual result.
+  var isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+             || window.innerWidth <= 768;
+
+  if (!isTouch) {
+    window.addEventListener('mousemove', function (e) {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+    drawSpotlight();
+  }
 
   // ── Scroll-driven hero zoom ───────────────────────────────────────────────
 

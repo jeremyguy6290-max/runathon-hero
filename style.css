@@ -663,17 +663,63 @@ body.cursor-active [role="button"] {
 }
 
 
-/* ── Responsive ── */
+/* ── Mobile (≤768px) ─────────────────────────────────────────────────────── */
 
-@media (max-width: 680px) {
+@media (max-width: 768px) {
+
+  /* ── Hero: spotlight off, text flipped to light ── */
+
+  /* Canvas is hidden — no cursor to follow on touch devices */
+  #spotlight {
+    display: none;
+  }
+
+  /* Desktop text is black, revealed by the spotlight beam.
+     On mobile there is no spotlight, so flip to off-white. */
+  .heading {
+    color: #f2f2f2;
+    font-size: clamp(44px, 12vw, 80px);
+  }
+
+  .subheading {
+    color: rgba(242, 242, 242, 0.72);
+    font-size: clamp(9px, 2.8vw, 13px);
+    letter-spacing: 0.28em;
+  }
+
+  /* ── Ambulance zoom: windscreen focus, sharper rendering ── */
+
+  /* Desktop origin 72% targets the lower body. Shift up to ~42% to land
+     nearer the windscreen on a typical ambulance side-view silhouette. */
+  .ambulance {
+    transform-origin: center 42%;
+    /* Promote to GPU layer with explicit 3D context; reduces subpixel blur
+       during the scale animation on iOS/Safari. */
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* ── Runner cursor: hidden on touch devices (no pointer) ── */
+  .runner {
+    display: none;
+  }
+
+  /* ── Stats: 2-column on small screens ── */
   .s-goal__stats {
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* ── Parliament: stacked, centered ── */
+
+  .s-parliament {
+    padding: clamp(56px, 10vh, 100px) 0;
+  }
+
   .s-parliament__grid {
     grid-template-columns: 1fr;
-    gap: clamp(40px, 8vw, 60px);
+    gap: clamp(32px, 7vw, 52px);
     text-align: center;
+    padding: 0 clamp(24px, 6vw, 48px);
   }
 
   .parl-col--left,
@@ -682,10 +728,45 @@ body.cursor-active [role="button"] {
     text-align: center;
   }
 
+  /* Remove the desktop order:-1 that pushed the beehive to the top.
+     Default DOM order (left → center → right) gives the correct mobile stack:
+       NEXT STOP / PARLIAMENT  ← parl-col--left
+       Beehive animation       ← parl-col--center
+       Meeting info            ← parl-col--right  */
   .parl-col--center {
-    order: -1;
+    order: 0;
   }
 
+  #parliament-canvas {
+    width: clamp(200px, 72vw, 280px);
+  }
+
+  .parl-eyebrow {
+    font-size: clamp(9px, 2.6vw, 11px);
+    letter-spacing: 0.28em;
+  }
+
+  .parl-heading {
+    font-size: clamp(24px, 7vw, 40px);
+  }
+
+  .parl-event-title {
+    font-size: clamp(13px, 3.8vw, 17px);
+  }
+
+  .parl-event-date {
+    font-size: clamp(10px, 2.5vw, 12px);
+    letter-spacing: 0.18em;
+  }
+
+  /* ── Run section: auto height on mobile (100vh can be too tall) ── */
+  .run-bigger-section {
+    height: auto;
+    min-height: 55vh;
+    padding: 80px 24px;
+  }
+
+  /* ── Navigation ── */
   .site-nav {
     padding: 12px clamp(16px, 4vw, 24px);
   }
