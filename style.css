@@ -114,6 +114,36 @@ body.cursor-active [role="button"] {
   will-change: transform;
 }
 
+/* ── Layer 2.5: easter egg — revealed only when spotlight passes over ──
+   mix-blend-mode: multiply makes this invisible against the black hero
+   background (#000 × any-colour = #000). When the spotlight canvas
+   paints cream/off-white beneath it the multiply reveals the egg's warm
+   tones as a slightly darker oval within the beam.
+   z-index: 2 places it above the spotlight canvas (z:1) and below the
+   ambulance (z:3). Desktop only — display:none on mobile. */
+.easter-egg {
+  position: absolute;
+  bottom: 48px;
+  left: 48px;
+  width: 28px;
+  height: 38px;
+  /* egg shape: rounder bottom, tighter top */
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  transform: rotate(-8deg);
+  background: radial-gradient(
+    ellipse at 38% 28%,
+    rgb(255, 252, 240) 0%,
+    rgb(238, 224, 186) 48%,
+    rgb(210, 194, 148) 100%
+  );
+  box-shadow:
+    inset -3px -5px 8px rgba(90, 65, 18, 0.26),
+    inset  3px  4px 8px rgba(255, 254, 246, 0.42);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 2;
+}
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    TEXT ZOOM SECTION
@@ -707,6 +737,10 @@ body.cursor-active [role="button"] {
 
   /* ── Runner cursor: hidden on touch devices (no pointer) ── */
   .runner {
+    display: none;
+  }
+
+  .easter-egg {
     display: none;
   }
 
